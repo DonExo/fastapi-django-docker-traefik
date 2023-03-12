@@ -1,12 +1,25 @@
 version: "3"
 
 services:
+  django:
+    build:
+      context: ./services/django/
+      dockerfile: Dockerfile
+    command: 'gunicorn --bind 0.0.0.0:8000 config.wsgi'
+    expose:
+      - 8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`django.dimitriovski.com`)"
+      - "traefik.http.routers.django.tls=true"
+      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
+
   api:
     build: ./services/api/
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app-http.rule=Host(`ssl.ahmedbesbes.com`)
+      - traefik.http.routers.app-http.rule=Host(`fastapi.dimitriovski.com`)
       - traefik.http.routers.app-http.tls=true
       - traefik.http.routers.app-http.tls.certresolver=letsencrypt
 
